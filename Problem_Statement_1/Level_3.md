@@ -1,38 +1,33 @@
-# ⚡ Level 3 — The Automata Architect
+# ⏱️ Level 3 — Real-Time Evolution
 
-[![Difficulty](https://img.shields.io/badge/Difficulty-Advanced-9b59b6?style=flat-square)](#)
-[![Concepts](https://img.shields.io/badge/Concepts-String%20Parsing%20|%20Rule%20Engines%20|%20RLE%20Format%20|%20Dynamic%20Coordinates-0d6efd?style=flat-square)](#)
+[![Difficulty](https://img.shields.io/badge/Difficulty-Beginner%20to%20Intermediate-2ecc71?style=flat-square)](#)
+[![Concepts](https://img.shields.io/badge/Concepts-Timed%20Loops%20|%20Screen%20Clearing%20|%20Reusing%20L2%20Logic-0d6efd?style=flat-square)](#)
 
 ---
 
 ## Background
 
-The astrobiology team has discovered that Martian organisms do not all obey Conway's standard rules. Some mutations survive in chaotic dense environments (*HighLife*), others reproduce with lightning speed like crystals (*Seeds*), while others thrive in inverted light-dark environments (*Day & Night*).
-
-Furthermore, the scientific community shares cellular automata patterns using the **RLE (Run Length Encoded)** standard file format rather than raw ASCII grids.
-
-The lab needs you to construct the ultimate cellular automata engine capable of simulating **any arbitrary Life-like rule** and ingesting industry-standard **RLE files**!
+Levels 1 and 2 print only the final grid after all generations are computed. Level 3 prints each generation as it happens, one frame at a time, with a short delay between frames.
 
 ---
 
 ## Your Task
 
-Implement an advanced cellular automata engine supporting the following components:
-
 | # | Feature | Description |
 |---|---|---|
-| 1 | **Generic Life-Like Rule Engine ($B.../S...$)** | Parse and simulate custom birth and survival rules (e.g. `B3/S23`, `B36/S23`, `B2/S`, `B3678/S34678`). |
-| 2 | **Standard RLE File Parser** | Parse and load patterns stored in the official **Run Length Encoded (.rle)** format. |
-| 3 | **Dynamic / Unbounded Bounding Box** | Track alive cells dynamically without rigid grid walls, auto-fitting the bounding box as the colony expands. |
-| 4 | **Cell Longevity Heatmap** | Track the age of every cell (how many consecutive generations it has survived continuously). |
+| 1 | **Real-Time Playback** | Print each generation, pause briefly, clear the screen, print the next. |
+| 2 | **Smart Auto-Stop** | Stop early if the pattern reaches Still Life, Oscillator, or Extinct — reuse your Level 2 classifier logic. |
+| 3 *(optional bonus)* | **Adjustable Speed** | Let the user set the delay between frames in milliseconds. |
 
 ---
 
 ## Rules
 
-- Use **any programming language** (Python, C++, Java, Rust, Go, etc.)
-- Single program file or modular project, run from terminal
-- **No external third-party automata libraries** — write the parsing and rule engine from scratch
+- Any programming language
+- Single program file, runs in your terminal
+- No GUI frameworks or third-party libraries
+- Using your language's built-in delay function (`sleep`, `Thread.sleep`, `setTimeout`, etc.) is allowed — no multithreading needed
+- Because output is printed in real time, plain captured text won't fully show the effect. Include a short screen recording or GIF along with your code.
 
 ---
 
@@ -40,240 +35,149 @@ Implement an advanced cellular automata engine supporting the following componen
 
 | Concept | Description |
 |---|---|
-| Rule Notation Parsing | Deconstructing `B<born_counts>/S<survive_counts>` into integer lookup sets |
-| RLE Tokenization | Parsing run counts (`3o`, `5b`), line breaks (`$`), and terminators (`!`) |
-| Sparse / Coordinate Sets | Representing infinite grids using sets of `(row, col)` tuples |
-| Longevity Matrices | Keeping a 2D integer counter for consecutive living generations |
+| Timed Loops | Pausing between iterations so frames appear at a readable pace |
+| Screen Clearing | Clearing the previous frame before printing the next |
+| Reusing Classifier Logic | Applying your Level 2 state-hashing logic to detect when to stop early |
+
+**Delay:** `time.sleep(1)` (Python), `std::this_thread::sleep_for(std::chrono::milliseconds(500))` (C++, in `<thread>` but doesn't spawn a thread), `Thread.sleep(1000)` (Java), `await new Promise(r => setTimeout(r, 1000))` (JS).
+
+**Clearing:** `os.system('cls' if os.name == 'nt' else 'clear')`, or print the ANSI code `"\033[H\033[J"` directly.
 
 ---
 
-## Detailed Specifications & Test Cases
+## Feature Specifications & Test Cases
 
----
+### Feature 1: Real-Time Playback
 
-### Feature 1: Generalized $B.../S...$ Rule Engine
-
-A Life-like rule is expressed as `B<digits>/S<digits>`:
-- `B<digits>`: Numbers of live neighbors required for a dead cell to be **Born**.
-- `S<digits>`: Numbers of live neighbors required for a live cell to **Survive**.
-- Any other neighbor count causes the cell to die or remain dead.
-
-| Rule Name | Notation | Characteristic |
-|---|---|---|
-| **Conway's Life** | `B3/S23` | Classic standard game of life |
-| **HighLife** | `B36/S23` | Features a famous self-replicating pattern |
-| **Seeds** | `B2/S` | All live cells die every step; 2 neighbors spawn new cells |
-| **Life without Death** | `B3/S012345678` | Cells never die; patterns grow like ink spreading on paper |
-| **Diamoeba** | `B35678/S5678` | Forms large diamond-shaped cell colonies |
+Each frame prints a header (generation number, population) followed by the grid, then pauses, clears, and prints the next frame.
 
 <details>
-<summary><strong>🧪 Feature 1 — Test Case 1: HighLife (B36/S23)</strong></summary>
+<summary><strong>🧪 Test Case: Blinker (delay = 1s)</strong></summary>
 <br>
-
-*Under HighLife, a dead cell with 6 live neighbors is born (unlike standard Conway).*
 
 **Input:**
 ```
-rule B36/S23
+animate
 5 5
-1
+2
+.....
 .###.
-#...#
-#...#
-#...#
+.....
+.....
+.....
+```
+
+**Frames (each replaces the previous one on screen):**
+```
+Generation: 0   Population: 3
+.....
 .###.
+.....
+.....
+.....
 ```
-
-**Output:**
 ```
-Rule: B36/S23
-Initial Population: 12
-Final Population: 16
-Peak Population: 16
-Final Grid:
+Generation: 1   Population: 3
+..#..
+..#..
+..#..
+.....
+.....
+```
+```
+Generation: 2   Population: 3
+.....
 .###.
-#.#.#
-##.##
-#.#.#
-.###.
-```
-</details>
-
-<details>
-<summary><strong>🧪 Feature 1 — Test Case 2: Seeds (B2/S)</strong></summary>
-<br>
-
-*Under Seeds, live cells always die (survival set is empty), and cells are born with exactly 2 neighbors.*
-
-**Input:**
-```
-rule B2/S
-4 4
-1
-....
-.##.
-....
-....
-```
-
-**Output:**
-```
-Rule: B2/S
-Initial Population: 2
-Final Population: 4
-Peak Population: 4
-Final Grid:
-.##.
-....
-.##.
-....
+.....
+.....
+.....
+Simulation complete.
 ```
 </details>
 
 ---
 
-### Feature 2: Standard RLE (Run Length Encoded) Parser
+### Feature 2: Smart Auto-Stop
 
-The RLE format is the standard format used by LifeWiki and cellular automata researchers:
-1. **Comments:** Lines starting with `#` are ignored (e.g. `#N`, `#O`, `#C`).
-2. **Header:** `x = <width>, y = <height>, rule = <rule_string>`
-3. **Encoded Rows:**
-   - `b` = dead cell
-   - `o` = live cell
-   - `<count><tag>` = run of `<count>` cells of type `<tag>` (e.g., `3o` = `ooo`, `4b` = `bbbb`). If count is omitted, it defaults to 1.
-   - `$` = end of line / next row. `<count>$` means skip `<count>` rows.
-   - `!` = end of pattern data.
+While animating, check each new state against previously seen states:
+- Population reaches 0 → `Extinct at Generation <S>`
+- Matches previous state → `Still Life reached at Generation <S>`
+- Matches a state seen `P` steps ago (`P ≥ 2`) → `Oscillator (Period <P>) reached at Generation <S>`
+- Otherwise keep going up to the generation limit `G`
 
 <details>
-<summary><strong>🧪 Feature 2 — Test Case 1: Glider RLE Decode & Step</strong></summary>
-<br>
-
-**Input (RLE file `glider.rle`):**
-```
-#N Glider
-#O Richard K. Guy
-#C The smallest spaceship.
-x = 3, y = 3, rule = B3/S23
-bob$2bo$3o!
-```
-
-**Execution Command:**
-```
-rle glider.rle 1
-```
-
-**Output:**
-```
-Pattern Name: Glider
-Bounding Box: 3 x 3
-Rule: B3/S23
-Initial Grid (0):
-.#.
-..#
-###
-
-State after Generation 1:
-...
-#.#
-.##
-.#.
-```
-</details>
-
-<details>
-<summary><strong>🧪 Feature 2 — Test Case 2: Run-Length Compression Decode</strong></summary>
-<br>
-
-**Input (RLE string):**
-```
-x = 6, y = 3, rule = B3/S23
-2b3o$3o2bo$bo!
-```
-
-**Decoded Grid (Generation 0):**
-```
-..###.
-###..#
-.#....
-```
-</details>
-
----
-
-### Feature 3: Dynamic Bounding Box & Expansion Tracking
-
-Instead of capping organisms within fixed boundary walls, track live cells dynamically across generations and compute the expanding bounding box $(W \times H)$.
-
-<details>
-<summary><strong>🧪 Feature 3 — Test Case 1: Expanding Glider Trajectory</strong></summary>
+<summary><strong>🧪 Test Case: Blinker with High Generation Limit</strong></summary>
 <br>
 
 **Input:**
 ```
-dynamic B3/S23
-3 3
-4
-.#.
-..#
-###
+animate
+5 5
+50
+.....
+.###.
+.....
+.....
+.....
 ```
 
-**Output:**
+**Result:** Frames play for Generation 0–2 as above. At Generation 2, the state matches Generation 0, so it stops instead of continuing to 50:
 ```
-Gen 0: Pop = 5 | Box: (0,0) to (2,2) [3 x 3]
-Gen 1: Pop = 5 | Box: (1,0) to (3,2) [3 x 3]
-Gen 2: Pop = 5 | Box: (1,1) to (3,3) [3 x 3]
-Gen 3: Pop = 5 | Box: (1,1) to (3,3) [3 x 3]
-Gen 4: Pop = 5 | Box: (1,1) to (3,3) [3 x 3]
-Displacement: (Row +1, Col +1)
+Generation: 2   Population: 3
+.....
+.###.
+.....
+.....
+.....
+Pattern stabilized: Oscillator (Period 2)
+Stopped early at Generation 2 (limit was 50)
 ```
 </details>
 
 ---
 
-### Feature 4: Cell Longevity Heatmap
+### Feature 3 *(Optional Bonus)*: Adjustable Speed
 
-Track for how many consecutive generations each cell has remained alive:
-- A newly born cell has age `1`.
-- If it survives the next generation, its age becomes `2`, `3`, etc.
-- When a cell dies, its age resets to `0` (`.`).
+Accept a delay value (in milliseconds) as an extra input instead of a fixed 1-second delay.
 
 <details>
-<summary><strong>🧪 Feature 4 — Test Case 1: Blinker vs Block Longevity</strong></summary>
+<summary><strong>🧪 Test Case: Custom Delay</strong></summary>
 <br>
 
 **Input:**
 ```
-longevity
-4 4
-3
-.##.
-.##.
-....
-....
+animate
+5 5
+2
+200
+.....
+.###.
+.....
+.....
+.....
 ```
+*(`200` = delay in ms, given right after the generation count.)*
 
-*(Block survives 3 generations without dying)*
-
-**Output:**
-```
-Longevity Heatmap (Gen 3):
-. 4 4 .
-. 4 4 .
-. . . .
-. . . .
-
-(Cells at [0,1], [0,2], [1,1], [1,2] have lived continuously for 4 generations: Gen 0, 1, 2, 3)
-```
+Same frame sequence as Feature 1, shown ~200ms apart instead of 1s.
 </details>
 
 ---
 
-## 🏆 Summary of Achievements
+## How to Run Your Submission
 
-Congratulations! By completing Level 3, you have engineered:
-- An ultra-flexible **Universal Life-Like Automata Engine**
-- A standards-compliant **RLE File Format Parser**
-- Dynamic **Coordinate Tracking** and **Cell Longevity Heatmaps**
+Add a short comment block at the top of your code (or a separate `RUN.md`) telling us exactly how to run it. Include:
 
-You are now ready to simulate complex automata systems, guns, spaceships, and self-replicating computers!
+- Language and version used
+- Compile command, if your language needs one (e.g. `g++ solution.cpp -o sim`)
+- Exact run command (e.g. `python solution.py`, `./sim`)
+- Any input file names or arguments your program expects
+
+Example:
+```
+// Language: C++17
+// Compile: g++ level3.cpp -o level3
+// Run: ./level3
+// Input: enter values directly in terminal when prompted, or pipe a file: ./level3 < input.txt
+```
+
+Submissions without clear run instructions may take longer to evaluate.
