@@ -7,26 +7,20 @@
 
 ## Background
 
-The Computational Astrobiology Laboratory at IIT Indore has made a startling discovery: microscopic synthetic cells thriving on the surface of an ancient Martian microchip!
-
-These digital organisms reproduce, starve, and cluster in an orderly lattice according to mathematical rules first proposed by John Conway. The lead researcher has tasked you with building the foundational simulation engine to observe how an initial colony evolves over time on a bounded grid.
-
-> *"We need to simulate these digital lifeforms with absolute precision — one tick of the clock at a time."*
+Conway's Game of Life is a grid simulation where every cell updates each step based on a fixed set of rules applied to its neighbors. You'll build the core engine: read a starting grid, simulate it for a number of steps, and report what happens.
 
 ---
 
 ## The Four Rules of Conway's Game of Life
 
-In each step (generation), every cell on an $R \times C$ grid looks at its **8 surrounding neighbors** (Moore neighborhood: top-left, top, top-right, left, right, bottom-left, bottom, bottom-right).
+In each step (generation), every cell on an $R \times C$ grid looks at its **8 surrounding neighbors** (Moore neighborhood: top-left, top, top-right, left, right, bottom-left, bottom, bottom-right). Cells outside the grid boundaries count as **dead**.
 
-Cells outside the grid boundaries are considered **dead** (fixed/dead boundary condition).
+1. **Underpopulation:** Any live cell with **fewer than 2** live neighbors dies.
+2. **Survival:** Any live cell with **2 or 3** live neighbors stays alive.
+3. **Overpopulation:** Any live cell with **more than 3** live neighbors dies.
+4. **Reproduction:** Any dead cell with **exactly 3** live neighbors becomes alive.
 
-1. **Underpopulation:** Any live cell with **strictly fewer than 2** live neighbors dies.
-2. **Survival:** Any live cell with **2 or 3** live neighbors remains alive.
-3. **Overpopulation:** Any live cell with **strictly more than 3** live neighbors dies.
-4. **Reproduction:** Any dead cell with **exactly 3** live neighbors becomes a live cell.
-
-> **Crucial Note:** All cells in generation $t$ update **simultaneously** to produce generation $t + 1$. A cell's new state must NOT affect the calculation of its neighbor's state in the same generation.
+> All cells update **simultaneously** — a cell's new state must not affect how its neighbors are evaluated in the same step.
 
 ---
 
@@ -36,31 +30,22 @@ Write a program that:
 
 1. Reads the grid dimensions: rows `R` and columns `C`.
 2. Reads the number of generations to simulate `G`.
-3. Reads `R` lines of text, each containing `C` characters:
-   - `.` represents a **dead cell**
-   - `#` represents a **live cell**
+3. Reads `R` lines of `C` characters each — `.` for dead, `#` for alive.
 4. Simulates the grid for `G` generations.
-5. Calculates and prints:
-   - **Initial Population:** Total count of live cells at generation 0
-   - **Final Population:** Total count of live cells after generation $G$
-   - **Peak Population:** The maximum number of live cells observed at any generation from $0$ to $G$ (inclusive)
-   - **Final Grid State:** The $R \times C$ grid after $G$ generations
+5. Prints:
+   - **Initial Population:** live cell count at generation 0
+   - **Final Population:** live cell count after generation $G$
+   - **Peak Population:** the highest live cell count seen from generation $0$ to $G$
+   - **Final Grid State:** the grid after $G$ generations
 
 ---
 
 ## Rules
 
-- Use **any programming language** (Python, C++, C, Java, Rust, JavaScript, etc.)
-- Write a single program file and run it in your terminal
-- **No GUI, no web app, no framework** — standard terminal I/O only
-- **No external third-party simulation libraries**
-
----
-
-## How to Read the Test Cases
-
-- **Input** provides the raw values: `R`, `C`, `G`, followed by the initial grid rows.
-- **Output** displays the summary metrics followed by the final grid configuration.
+- Any programming language (Python, C++, C, Java, Rust, JavaScript, etc.)
+- Single program file, runs in your terminal
+- No GUI, no web app, no framework
+- No external simulation libraries
 
 ---
 
@@ -75,9 +60,9 @@ G
 <row R>
 ```
 
-- Line 1: Two integers `R` and `C` ($1 \le R, C \le 100$) — rows and columns.
-- Line 2: An integer `G` ($0 \le G \le 1000$) — number of generations to simulate.
-- Next `R` lines: A string of length `C` containing only `.` and `#`.
+- Line 1: `R` and `C` ($1 \le R, C \le 100$) — rows and columns.
+- Line 2: `G` ($0 \le G \le 1000$) — number of generations to simulate.
+- Next `R` lines: a string of length `C` containing only `.` and `#`.
 
 ---
 
@@ -104,7 +89,7 @@ Final Grid:
 | Nested Loops | Iterating across rows and columns to inspect neighbors |
 | Moore Neighborhood | Checking 8 directions $(dr \in \{-1, 0, 1\}, dc \in \{-1, 0, 1\})$ |
 | Double Buffering | Keeping a copy of the previous grid to update states simultaneously |
-| Boundary Checks | Ensuring neighbor coordinates remain within $[0, R-1]$ and $[0, C-1]$ |
+| Boundary Checks | Keeping neighbor coordinates within $[0, R-1]$ and $[0, C-1]$ |
 | State Tracking | Tracking initial, peak, and final live cell counts |
 
 ---
@@ -146,7 +131,7 @@ Final Grid:
 <summary><strong>🧪 Test Case 2 — The Blinker (2 Generations)</strong></summary>
 <br>
 
-*After 2 generations, the blinker oscillates back to its original horizontal state.*
+*After 2 generations, it oscillates back to its original state.*
 
 **Input:**
 ```
@@ -177,7 +162,7 @@ Final Grid:
 <summary><strong>🧪 Test Case 3 — The Block (Still Life, 5 Generations)</strong></summary>
 <br>
 
-*A 2x2 square is a still life: each cell has exactly 3 neighbors, so it never changes.*
+*A 2x2 square never changes — each cell always has exactly 3 neighbors.*
 
 **Input:**
 ```
@@ -206,7 +191,7 @@ Final Grid:
 <summary><strong>🧪 Test Case 4 — The Glider (4 Generations)</strong></summary>
 <br>
 
-*A glider moves 1 diagonal step across the grid every 4 generations.*
+*A glider shifts 1 diagonal step every 4 generations.*
 
 **Input:**
 ```
@@ -270,7 +255,7 @@ Final Grid:
 <summary><strong>🧪 Test Case 6 — The Beacon Oscillator</strong></summary>
 <br>
 
-*Two touching 2x2 blocks oscillate in a period of 2.*
+*Two touching 2x2 blocks oscillate with period 2.*
 
 **Input:**
 ```
@@ -303,7 +288,7 @@ Final Grid:
 <summary><strong>🧪 Test Case 7 — Underpopulation & Extinction</strong></summary>
 <br>
 
-*Isolated cells have 0 neighbors and immediately perish.*
+*Isolated cells have 0 neighbors and die.*
 
 **Input:**
 ```
@@ -330,7 +315,7 @@ Final Grid:
 <summary><strong>🧪 Test Case 8 — Overpopulation & Birth Surge</strong></summary>
 <br>
 
-*A central cross pattern triggers births and overpopulation deaths simultaneously.*
+*A cross pattern triggers births and overpopulation deaths at the same time.*
 
 **Input:**
 ```
@@ -357,7 +342,7 @@ Final Grid:
 <summary><strong>🧪 Test Case 9 — Zero Generations (Edge Case)</strong></summary>
 <br>
 
-*When G = 0, the grid remains identical to the initial state.*
+*When G = 0, the grid stays identical to the initial state.*
 
 **Input:**
 ```
@@ -384,7 +369,7 @@ Final Grid:
 <summary><strong>🧪 Test Case 10 — Bounded Boundary Decay</strong></summary>
 <br>
 
-*Cells on the border have fewer neighbors because out-of-bound cells are dead.*
+*Border cells have fewer neighbors since out-of-bound cells are dead.*
 
 **Input:**
 ```
@@ -411,4 +396,4 @@ Final Grid:
 
 ---
 
-*Once you're confident Level 1 works, level up your toolkit in [Level 2 — The Pattern Watcher](Level_2.md).*
+*Once Level 1 works, move on to [Level 2 — The Pattern Watcher](Level_2.md).*
