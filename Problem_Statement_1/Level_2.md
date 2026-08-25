@@ -18,7 +18,7 @@ Build on your Level 1 code and implement the following features:
 | # | Feature | Description |
 |---|---|---|
 | 1 | **Toroidal Wrap-Around Mode** | Cells at the edge connect seamlessly to the opposite edge (donut topology). |
-| 2 | **Automated Pattern Classifier** | Detect if a pattern is a **Still Life**, **Oscillator (with period $P$)**, **Extinct**, or **Active** within $K$ steps. |
+| 2 | **Automated Pattern Classifier** | Detect if a pattern is a **Still Life**, **Oscillator (with period $P$)**, **Extinct**, or **Active**. |
 | 3 | **Center of Mass & Bounding Box** | Compute the bounding box dimensions ($H \times W$) and center of mass $(r_{avg}, c_{avg})$ of live cells. |
 
 ---
@@ -126,22 +126,32 @@ Final Grid:
 
 ### Feature 2: Automated Pattern Classifier
 
-Simulate the grid step-by-step up to a maximum limit of $K$ steps (default $K=100$) and identify its state:
+Simulate the grid step-by-step and identify its state:
 
 - **`Extinct`**: All cells have died (population = 0 at step $S$).
 - **`Still Life`**: The grid configuration at step $S$ is identical to step $S-1$ (Period 1).
 - **`Oscillator (Period P)`**: The grid configuration at step $S$ is identical to a previous step $S - P$ where $P \ge 2$.
-- **`Active`**: The grid has not repeated or died out within $K$ steps.
+- **`Active`**: The grid has not repeated or died out within the step limit.
+
+**Step limit:** The base `classify` command always uses a fixed limit of **K = 10** steps. You don't read this from input — just use 10 directly in your code.
+
+**Input format:**
+```
+classify
+R C
+<row 1>
+...
+<row R>
+```
 
 <details>
-<summary><strong>🧪 Feature 2 — Test Case 1: Block (Still Life)</strong></summary>
+<summary><strong>🧪 Test Case 1: Block (Still Life)</strong></summary>
 <br>
 
 **Input:**
 ```
 classify
 4 4
-50
 ....
 .##.
 .##.
@@ -158,14 +168,13 @@ Final Population: 4
 </details>
 
 <details>
-<summary><strong>🧪 Feature 2 — Test Case 2: Blinker (Oscillator Period 2)</strong></summary>
+<summary><strong>🧪 Test Case 2: Blinker (Oscillator Period 2)</strong></summary>
 <br>
 
 **Input:**
 ```
 classify
 5 5
-50
 .....
 .###.
 .....
@@ -183,14 +192,13 @@ Population: 3
 </details>
 
 <details>
-<summary><strong>🧪 Feature 2 — Test Case 3: Toad (Oscillator Period 2)</strong></summary>
+<summary><strong>🧪 Test Case 3: Toad (Oscillator Period 2)</strong></summary>
 <br>
 
 **Input:**
 ```
 classify
 6 6
-50
 ......
 ..###.
 .###..
@@ -209,14 +217,13 @@ Population: 6
 </details>
 
 <details>
-<summary><strong>🧪 Feature 2 — Test Case 4: Extinction</strong></summary>
+<summary><strong>🧪 Test Case 4: Extinction</strong></summary>
 <br>
 
 **Input:**
 ```
 classify
 3 3
-50
 #..
 .##
 ...
@@ -232,6 +239,48 @@ Final Population: 0
 
 ---
 
+#### Bonus: Custom Step Limit
+
+Add a second command, `classifyk`, which reads an explicit `K` value from input right after `R C`, and uses that instead of the fixed default of 10.
+
+**Input format:**
+```
+classifyk
+R C
+K
+<row 1>
+...
+<row R>
+```
+
+<details>
+<summary><strong>🧪 Bonus Test Case: Blinker with K = 1</strong></summary>
+<br>
+
+*With only 1 step to check, the Blinker's period-2 oscillation hasn't repeated yet — so it's correctly classified as Active, even though it's an oscillator if given more steps.*
+
+**Input:**
+```
+classifyk
+5 5
+1
+.....
+.###.
+.....
+.....
+.....
+```
+
+**Output:**
+```
+Classification: Active
+Reason: No repeat or extinction detected within K = 1 steps
+Final Population: 3
+```
+</details>
+
+---
+
 ### Feature 3: Center of Mass & Bounding Box
 
 For a given grid with $N$ live cells located at coordinates $(r_1, c_1), (r_2, c_2), \dots, (r_N, c_N)$:
@@ -240,7 +289,7 @@ For a given grid with $N$ live cells located at coordinates $(r_1, c_1), (r_2, c
 - If $N = 0$, print `No live cells`.
 
 <details>
-<summary><strong>🧪 Feature 3 — Test Case 1: Glider Metrics</strong></summary>
+<summary><strong>🧪 Test Case 1: Glider Metrics</strong></summary>
 <br>
 
 **Input:**
@@ -264,7 +313,7 @@ Center of Mass: (1.40, 1.00)
 </details>
 
 <details>
-<summary><strong>🧪 Feature 3 — Test Case 2: Empty Grid</strong></summary>
+<summary><strong>🧪 Test Case 2: Empty Grid</strong></summary>
 <br>
 
 **Input:**
@@ -287,4 +336,4 @@ Center of Mass: N/A
 
 ---
 
-*Ready for the ultimate challenge? Head over to [Level 3 — The Automata Architect](Level_3.md)!*
+*Ready for the ultimate challenge? Head over to [Level 3 — Real-Time Evolution](Level_3.md)!*
