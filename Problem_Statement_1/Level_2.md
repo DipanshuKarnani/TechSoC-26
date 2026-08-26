@@ -73,22 +73,22 @@ neighbor_col = (c + dc + C) % C
 **Input:**
 ```
 toroidal
-3 3
+3 5
 1
-#.#
-...
-...
+.....
+##..#
+.....
 ```
 
 **Output:**
 ```
 Mode: Toroidal
-Initial Population: 2
+Initial Population: 3
 Final Population: 3
 Final Grid:
-#..
-#..
-#..
+#....
+#....
+#....
 ```
 </details>
 
