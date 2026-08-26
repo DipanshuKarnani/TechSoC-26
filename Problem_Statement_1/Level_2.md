@@ -113,7 +113,7 @@ toroidal
 ```
 Mode: Toroidal
 Initial Population: 5
-Final Population: 5
+Final Population: 4
 Final Grid:
 #...
 .#.#
